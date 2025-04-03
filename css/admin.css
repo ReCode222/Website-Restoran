@@ -1,0 +1,509 @@
+/* Base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f7fa;
+    color: #333;
+}
+
+.admin-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 250px;
+    background-color: #1a237e;
+    color: #ffffff;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    position: fixed;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.sidebar.hidden {
+    transform: translateX(-100%);
+}
+
+.logo-container {
+    text-align: center;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.logo {
+    width: 100px;
+    height: auto;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.logo:hover {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.nav-menu a {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    color: #ffffff;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    margin-bottom: 0.8rem;
+}
+
+.nav-menu a i {
+    margin-right: 1rem;
+    font-size: 1.2rem;
+}
+
+.nav-menu a span {
+    font-size: 1rem;
+}
+
+.nav-menu a:hover,
+.nav-menu a.active {
+    background-color: #303f9f;
+    transform: translateX(5px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.logout {
+    margin-top: 2rem;
+    color: #ff5252;
+    font-weight: bold;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding: 2.5rem;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+    margin-left: 250px;
+}
+
+.main-content.expanded {
+    margin-left: 0;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    color: #1a237e;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    margin-right: 1rem;
+    display: block; /* Ubah dari 'none' menjadi 'block' */
+}
+
+.user-info {
+    color: #1a237e;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Dashboard Cards */
+.dashboard-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1.5rem;
+}
+
+.card {
+    flex: 0 1 calc(33.333% - 2rem);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.card:nth-child(4),
+.card:nth-child(5) {
+    flex: 0 1 calc(50% - 2rem);
+}
+
+.card.total-pesanan {
+    background: linear-gradient(135deg, #ffffff, #f0f4ff);
+}
+
+.card.pesanan-selesai {
+    background: linear-gradient(135deg, #ffffff, #e8f5e9);
+}
+
+.card.pesanan-pending {
+    background: linear-gradient(135deg, #ffffff, #fff3e0);
+}
+
+.card.pesanan-diproses {
+    background: linear-gradient(135deg, #ffffff, #e3f2fd);
+}
+
+.card.pesanan-dibatalkan {
+    background: linear-gradient(135deg, #ffffff, #ffebee);
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+    transform: rotate(45deg);
+    transition: all 0.6s ease;
+}
+
+.card:hover::before {
+    left: 100%;
+    top: 100%;
+}
+
+.card:hover {
+    transform: translateY(-15px) scale(1.03);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+.card i {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.card.total-pesanan i { color: #1a237e; }
+.card.pesanan-selesai i { color: #4CAF50; }
+.card.pesanan-pending i { color: #FF9800; }
+.card.pesanan-diproses i { color: #2196F3; }
+.card.pesanan-dibatalkan i { color: #F44336; }
+
+.card:hover i {
+    transform: scale(1.1) rotate(10deg);
+}
+
+.card h3 {
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.card.total-pesanan h3 { color: #1a237e; }
+.card.pesanan-selesai h3 { color: #2E7D32; }
+.card.pesanan-pending h3 { color: #E65100; }
+.card.pesanan-diproses h3 { color: #1565C0; }
+.card.pesanan-dibatalkan h3 { color: #C62828; }
+
+.card p {
+    font-size: 1.1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.card.total-pesanan p { color: #303F9F; }
+.card.pesanan-selesai p { color: #388E3C; }
+.card.pesanan-pending p { color: #F57C00; }
+.card.pesanan-diproses p { color: #1976D2; }
+.card.pesanan-dibatalkan p { color: #D32F2F; }
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 220px;
+    }
+    .main-content {
+        margin-left: 220px;
+    }
+    .card {
+        flex: 0 1 calc(50% - 2rem);
+    }
+    .card:nth-child(4),
+    .card:nth-child(5) {
+        flex: 0 1 calc(50% - 2rem);
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1000;
+        padding: 0.5rem;
+    }
+    
+    .sidebar.hidden {
+        transform: translateY(-100%);
+    }
+    
+    .logo-container {
+        padding: 0.5rem 0;
+    }
+    
+    .logo {
+        width: 60px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .nav-menu {
+        display: flex;
+        justify-content: space-around;
+    }
+    
+    .nav-menu a {
+        padding: 0.5rem;
+        margin-bottom: 0;
+    }
+    
+    .nav-menu a i {
+        margin-right: 0.5rem;
+        font-size: 1rem;
+    }
+    
+    .nav-menu a span {
+        display: inline-block;
+        font-size: 0.9rem;
+    }
+    
+    .main-content {
+        margin-left: 0;
+        margin-top: 80px;
+        width: 100%;
+        padding: 1.5rem;
+    }
+    
+    .main-content.expanded {
+        margin-left: 0;
+        margin-top: 0;
+    }
+    
+    .card {
+        flex: 0 1 calc(50% - 1rem);
+        padding: 1.5rem;
+    }
+    
+    .card:nth-child(4),
+    .card:nth-child(5) {
+        flex: 0 1 calc(50% - 1rem);
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar {
+        padding: 0.3rem;
+    }
+    
+    .logo {
+        width: 40px;
+    }
+    
+    .nav-menu a {
+        padding: 0.3rem;
+    }
+    
+    .nav-menu a i {
+        font-size: 0.9rem;
+    }
+    
+    .nav-menu a span {
+        font-size: 0.8rem;
+    }
+    
+    .main-content {
+        padding: 1rem;
+        margin-top: 70px;
+    }
+    
+    header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .toggle-btn {
+        font-size: 1.2rem;
+        padding: 0.3rem;
+        margin-right: 0.5rem;
+    }
+    
+    .user-info {
+        font-size: 0.9rem;
+    }
+    
+    .card {
+        flex: 0 1 100%;
+        padding: 1.2rem;
+    }
+    
+    .card:nth-child(4),
+    .card:nth-child(5) {
+        flex: 0 1 100%;
+    }
+    
+    .card i {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .card h3 {
+        font-size: 1.2rem;
+    }
+    
+    .card p {
+        font-size: 1rem;
+    }
+}
+
+/* Perbaiki style modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    overflow-y: auto;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.modal h2 {
+    margin-bottom: 1.5rem;
+    color: #1a237e;
+}
+
+.modal button {
+    background: #1a237e;
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 1rem;
+}
+
+.modal button[type="button"] {
+    background: #f44336;
+}
+
+.modal button:hover {
+    opacity: 0.9;
+}
+
+/* Chart Container Styles */
+.chart-container {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-top: 2rem;
+    width: 100%;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 0 1rem;
+}
+
+.chart-header h2 {
+    font-size: 1.5rem;
+    color: #1a237e;
+}
+
+.period-filter select {
+    padding: 0.7rem 1.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    background-color: white;
+    font-size: 1.1rem;
+    color: #333;
+    cursor: pointer;
+    min-width: 150px;
+}
+
+.period-filter select:focus {
+    outline: none;
+    border-color: #1a237e;
+}
+
+/* Responsive Chart */
+@media (max-width: 1400px) {
+    .chart-container {
+        max-width: 1000px;
+        padding: 2rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .chart-container {
+        max-width: 800px;
+        padding: 1.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .chart-container {
+        padding: 1rem;
+        max-width: 100%;
+    }
+    
+    .chart-header {
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .period-filter select {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+}
