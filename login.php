@@ -1,6 +1,8 @@
 <?php
 session_start();
 require_once 'database/config-login.php';
+include 'auto_cancel.php';
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];

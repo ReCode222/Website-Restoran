@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/menu.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <?php if (isset($_GET['order'])) : ?>
+    <?php if (isset($_GET['id'])) : ?>
     <meta http-equiv="refresh" content="5">
     <?php endif; ?>
 </head>
@@ -15,82 +15,75 @@
     <div class="container">
         <img src="assets/logo.png" alt="Logo Restoran" class="logo">
         <h1>Restoran Makan Mania</h1>
-        
+
         <?php
-        // Debugging
         error_reporting(E_ALL);
         ini_set('display_errors', 1);
-        
-        // Tambahkan koneksi database
-        require_once 'database/config-login.php';
 
-        if (isset($_GET['order'])) {
-            $orderNumber = htmlspecialchars($_GET['order']);
-            
-            // Debug query
-            $sql = "SELECT * FROM orders WHERE order_number = ?";
+        require_once 'database/config-login.php';
+        include 'auto_cancel.php';
+
+
+        if (isset($_GET['id'])) {
+            $orderId = htmlspecialchars($_GET['id']);
+
+            $sql = "SELECT * FROM orders WHERE id = ?";
             $stmt = mysqli_prepare($conn, $sql);
-            mysqli_stmt_bind_param($stmt, "i", $orderNumber);
+            mysqli_stmt_bind_param($stmt, "i", $orderId);
             mysqli_stmt_execute($stmt);
             $result = mysqli_stmt_get_result($stmt);
             $order = mysqli_fetch_assoc($result);
-            
+
             echo "<!-- Debug Order: ";
             print_r($order);
             echo " -->";
         }
-        
-        // Tampilkan parameter GET untuk debugging
+
         echo "<!-- Debug: ";
         print_r($_GET);
         echo " -->";
-        
-        // Tambahkan fungsi untuk mengambil status pesanan
-        function getOrderStatus($orderNumber) {
+
+        function getOrderStatus($orderId) {
             global $conn;
-            
-            // Debug koneksi
+
             if (!$conn) {
                 error_log("Database connection failed");
                 return 'pending';
             }
-            
-            $sql = "SELECT status FROM orders WHERE order_number = ?";
+
+            $sql = "SELECT status FROM orders WHERE id = ?";
             $stmt = mysqli_prepare($conn, $sql);
-            
+
             if (!$stmt) {
                 error_log("Prepare statement failed: " . mysqli_error($conn));
                 return 'pending';
             }
-            
-            mysqli_stmt_bind_param($stmt, "i", $orderNumber);
-            
+
+            mysqli_stmt_bind_param($stmt, "i", $orderId);
+
             if (!mysqli_stmt_execute($stmt)) {
                 error_log("Execute statement failed: " . mysqli_stmt_error($stmt));
                 return 'pending';
             }
-            
+
             $result = mysqli_stmt_get_result($stmt);
             $row = mysqli_fetch_assoc($result);
-            
-            // Debug hasil query
+
             error_log("Order query result: " . print_r($row, true));
-            
+
             return $row['status'] ?? 'pending';
         }
-        
-        // Tampilkan status pesanan jika ada parameter order
-        if (isset($_GET['order'])) {
-            $orderNumber = htmlspecialchars($_GET['order']);
-            $status = getOrderStatus($orderNumber);
-            
-            // Debugging
+
+        if (isset($_GET['id'])) {
+            $orderId = htmlspecialchars($_GET['id']);
+            $status = getOrderStatus($orderId);
+
             error_log("Status from DB: " . $status);
-            
+
             $statusText = '';
             $statusClass = '';
             $showOrderAgain = false;
-            
+
             switch($status) {
                 case 'completed':
                     $statusText = 'Pesanan Selesai';
@@ -114,21 +107,21 @@
                     $statusClass = 'pending';
                     $noteText = 'Silahkan tunggu pesanan Anda';
             }
-            
+
             echo '
             <div class="order-status">
                 <div class="status-content">
                     <h3>Status Pesanan</h3>
-                    <p>Nomor Antrian: <strong>' . $orderNumber . '</strong></p>
+                    <p>Nomor Pesanan: <strong>' . ($order['order_number'] ?? $orderId) . '</strong></p>
                     <p>Status: <span class="status-badge ' . $statusClass . '">' . $statusText . '</span></p>
                     <p class="order-note">' . $noteText . '</p>';
-            
+
             if ($showOrderAgain) {
                 echo '<button onclick="window.location.href=\'user/menu.php\'" class="btn-order-again">
                         Pesan Lagi
                       </button>';
             }
-            
+
             echo '</div></div>';
         } else {
             echo '
@@ -138,10 +131,11 @@
         }
         ?>
     </div>
-    <?php if (isset($_GET['order'])) : ?>
+
+    <?php if (isset($_GET['id'])) : ?>
     <script>
     function checkOrderStatus() {
-        fetch('check_status.php?order=<?php echo $orderNumber; ?>')
+        fetch('check_status.php?id=<?php echo $orderId; ?>')
             .then(response => response.json())
             .then(data => {
                 if (data.status !== '<?php echo $status; ?>') {

@@ -195,8 +195,8 @@
             .then(data => {
                 console.log('Response:', data);
                 if (data.status === 'success') {
-                    // Redirect ke index.php dengan parameter nomor order
-                    window.location.href = '../index.php?order=' + data.orderNumber;
+                    // Menggunakan id bukan orderNumber
+                    window.location.href = '../index.php?id=' + data.orderId;
                 } else {
                     alert('Terjadi kesalahan: ' + data.message);
                 }

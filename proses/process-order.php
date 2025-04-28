@@ -63,12 +63,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Commit transaction
         mysqli_commit($conn);
         
-        // Send success response with order number
+        // Send success response with order ID instead of order number
         header('Content-Type: application/json');
         echo json_encode([
             'status' => 'success',
             'message' => 'Order created successfully',
-            'orderNumber' => $orderNumber
+            'orderId' => $orderId
         ]);
         
     } catch (Exception $e) {

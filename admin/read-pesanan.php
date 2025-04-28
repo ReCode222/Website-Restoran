@@ -103,6 +103,52 @@ function getAllOrders($start_date = null, $end_date = null) {
     }
 }
 
+// Fungsi untuk mendapatkan pesanan completed berdasarkan rentang tanggal
+function getCompletedOrders($start_date = null, $end_date = null) {
+    global $conn;
+    if (!$start_date) {
+        $start_date = date('Y-m-d', strtotime('-7 days'));
+    }
+    if (!$end_date) {
+        $end_date = date('Y-m-d');
+    }
+    $sql = "SELECT id, total_price, status, created_at FROM orders WHERE status = 'completed' AND DATE(created_at) BETWEEN ? AND ? ORDER BY created_at DESC";
+    try {
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $start_date, $end_date);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    } catch (Exception $e) {
+        error_log("Error in getCompletedOrders: " . $e->getMessage());
+        return [];
+    }
+}
+
+// Fungsi untuk mendapatkan ringkasan pesanan completed
+function getCompletedSummary($start_date = null, $end_date = null) {
+    global $conn;
+    if (!$start_date) {
+        $start_date = date('Y-m-d', strtotime('-7 days'));
+    }
+    if (!$end_date) {
+        $end_date = date('Y-m-d');
+    }
+    $sql = "SELECT COALESCE(SUM(total_price), 0) as total_revenue, COUNT(*) as total_orders, COALESCE(AVG(total_price), 0) as avg_order FROM orders WHERE status = 'completed' AND DATE(created_at) BETWEEN ? AND ?";
+    try {
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ss", $start_date, $end_date);
+        $stmt->execute();
+        return $stmt->get_result()->fetch_assoc();
+    } catch (Exception $e) {
+        error_log("Error in getCompletedSummary: " . $e->getMessage());
+        return [
+            'total_revenue' => 0,
+            'total_orders' => 0,
+            'avg_order' => 0
+        ];
+    }
+}
+
 // Inisialisasi data dengan rentang tanggal
 $start_date = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-d', strtotime('-7 days'));
 $end_date = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
@@ -110,6 +156,8 @@ $end_date = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
 $orderData = getOrderData($start_date, $end_date);
 $summary = getOrderSummary($start_date, $end_date);
 $allOrders = getAllOrders($start_date, $end_date);
+$completedOrders = getCompletedOrders($start_date, $end_date);
+$completedSummary = getCompletedSummary($start_date, $end_date);
 
 // Format data untuk grafik
 $chartLabels = [];
@@ -198,7 +246,11 @@ foreach ($orderData as $data) {
                 <div class="sales-summary">
                     <div class="summary-card">
                         <h3>Total Pendapatan</h3>
-                        <div class="value" id="totalRevenue">Rp <?php echo number_format($summary['total_revenue'], 0, ',', '.'); ?></div>
+                        <div class="value" id="totalRevenue">Rp <?php echo number_format($completedSummary['total_revenue'], 0, ',', '.'); ?></div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Total Pesanan Selesai</h3>
+                        <div class="value" id="totalCompletedOrders"><?php echo $completedSummary['total_orders']; ?></div>
                     </div>
                     <div class="summary-card">
                         <h3>Total Pesanan</h3>
@@ -206,12 +258,39 @@ foreach ($orderData as $data) {
                     </div>
                     <div class="summary-card">
                         <h3>Rata-rata Pesanan</h3>
-                        <div class="value" id="avgOrder">Rp <?php echo number_format($summary['avg_order'], 0, ',', '.'); ?></div>
+                        <div class="value" id="avgOrder">Rp <?php echo number_format($completedSummary['avg_order'], 0, ',', '.'); ?></div>
                     </div>
                 </div>
 
                 <div class="chart-container">
                     <canvas id="salesChart"></canvas>
+                </div>
+
+                <div class="table-container">
+                    <h3 style="margin-bottom: 0.5rem; color: #4CAF50;">Tabel Pesanan Selesai</h3>
+                    <table class="orders-table" id="completedOrdersTable">
+                        <thead>
+                            <tr>
+                                <th>ID Pesanan</th>
+                                <th>Total Harga</th>
+                                <th>Status</th>
+                                <th>Tanggal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($completedOrders as $order): ?>
+                            <tr>
+                                <td><?php echo $order['id']; ?></td>
+                                <td>Rp <?php echo number_format($order['total_price'], 0, ',', '.'); ?></td>
+                                <td><span class="status-badge status-completed">Selesai</span></td>
+                                <td><?php echo date('d/m/Y H:i', strtotime($order['created_at'])); ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                            <?php if (count($completedOrders) === 0): ?>
+                            <tr><td colspan="4" style="text-align:center;">Tidak ada pesanan selesai pada rentang waktu ini.</td></tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
 
                 <div class="table-container">
@@ -344,11 +423,24 @@ foreach ($orderData as $data) {
 
                     // Update summary cards
                     document.getElementById('totalRevenue').textContent = 
-                        'Rp ' + new Intl.NumberFormat('id-ID').format(data.summary.total_revenue);
+                        'Rp ' + new Intl.NumberFormat('id-ID').format(data.completedSummary.total_revenue);
+                    document.getElementById('totalCompletedOrders').textContent = 
+                        data.completedSummary.total_orders;
                     document.getElementById('totalOrders').textContent = 
                         data.summary.total_orders;
                     document.getElementById('avgOrder').textContent = 
-                        'Rp ' + new Intl.NumberFormat('id-ID').format(data.summary.avg_order);
+                        'Rp ' + new Intl.NumberFormat('id-ID').format(data.completedSummary.avg_order);
+
+                    // Update completed table
+                    const completedTableBody = document.querySelector('#completedOrdersTable tbody');
+                    completedTableBody.innerHTML = data.completedOrders.length > 0 ? data.completedOrders.map(order => `
+                        <tr>
+                            <td>${order.id}</td>
+                            <td>Rp ${new Intl.NumberFormat('id-ID').format(order.total_price)}</td>
+                            <td><span class="status-badge status-completed">Selesai</span></td>
+                            <td>${formatDate(order.created_at)}</td>
+                        </tr>
+                    `).join('') : '<tr><td colspan="4" style="text-align:center;">Tidak ada pesanan selesai pada rentang waktu ini.</td></tr>';
 
                     // Update table
                     const tableBody = document.querySelector('#ordersTable tbody');

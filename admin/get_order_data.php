@@ -54,6 +54,29 @@ try {
     $stmt_table->execute();
     $result_table = $stmt_table->get_result();
 
+    // Query untuk tabel completed
+    $sql_completed = "SELECT id, total_price, status, created_at FROM orders WHERE status = 'completed' AND DATE(created_at) BETWEEN ? AND ? ORDER BY created_at DESC";
+    $stmt_completed = $conn->prepare($sql_completed);
+    $stmt_completed->bind_param("ss", $start_date, $end_date);
+    $stmt_completed->execute();
+    $result_completed = $stmt_completed->get_result();
+    $completedOrders = [];
+    while ($row = $result_completed->fetch_assoc()) {
+        $completedOrders[] = [
+            'id' => $row['id'],
+            'total_price' => $row['total_price'],
+            'status' => $row['status'],
+            'created_at' => $row['created_at']
+        ];
+    }
+
+    // Query untuk summary completed
+    $sql_completed_summary = "SELECT COALESCE(SUM(total_price), 0) as total_revenue, COUNT(*) as total_orders, COALESCE(AVG(total_price), 0) as avg_order FROM orders WHERE status = 'completed' AND DATE(created_at) BETWEEN ? AND ?";
+    $stmt_completed_summary = $conn->prepare($sql_completed_summary);
+    $stmt_completed_summary->bind_param("ss", $start_date, $end_date);
+    $stmt_completed_summary->execute();
+    $completedSummary = $stmt_completed_summary->get_result()->fetch_assoc();
+
     $labels = [];
     $pending = [];
     $processing = [];
@@ -92,6 +115,12 @@ try {
             'total_revenue' => (float)$summary['total_revenue'],
             'total_orders' => (int)$summary['total_orders'],
             'avg_order' => (float)$summary['avg_order']
+        ],
+        'completedOrders' => $completedOrders,
+        'completedSummary' => [
+            'total_revenue' => (float)$completedSummary['total_revenue'],
+            'total_orders' => (int)$completedSummary['total_orders'],
+            'avg_order' => (float)$completedSummary['avg_order']
         ]
     ]);
 

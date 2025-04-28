@@ -100,31 +100,30 @@ table td:last-child {
 }
 
 .status {
-    display: inline-block;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
+    padding: 5px 10px;
+    border-radius: 4px;
     font-weight: 500;
+    font-size: 14px;
 }
 
 .status.pending {
-    background-color: #fff7ed;
-    color: #9a3412;
+    background-color: #fff3cd;
+    color: #856404;
 }
 
 .status.processing {
-    background-color: #ecfdf5;
-    color: #047857;
+    background-color: #cce5ff;
+    color: #004085;
 }
 
 .status.completed {
-    background-color: #f0fdf4;
-    color: #166534;
+    background-color: #d4edda;
+    color: #155724;
 }
 
 .status.cancelled {
-    background-color: #fef2f2;
-    color: #b91c1c;
+    background-color: #f8d7da;
+    color: #721c24;
 }
 
 .no-data {
