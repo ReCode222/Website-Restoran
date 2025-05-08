@@ -46,6 +46,8 @@ try {
             $this->SetY(-15);
             $this->SetFont('helvetica', 'I', 8);
             $this->Cell(0, 10, 'Halaman ' . $this->getAliasNumPage() . ' dari ' . $this->getAliasNbPages(), 0, false, 'C');
+            // Tambahkan garis horizontal sebelum nomor halaman
+            $this->Line(10, $this->GetY() - 2, 200, $this->GetY() - 2);
         }
     }
 
@@ -62,7 +64,7 @@ try {
     // Judul laporan
     $pdf->Ln(5);
     $pdf->SetFont('helvetica', 'B', 14);
-    $pdf->Cell(0, 10, 'Laporan Rekapitulasi Pesanan', 0, 1, 'C');
+    $pdf->Cell(0, 10, 'LAPORAN REKAPITULASI PESANAN', 0, 1, 'C');
     $pdf->Ln(2);
 
     // Informasi laporan

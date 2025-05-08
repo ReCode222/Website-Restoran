@@ -60,6 +60,12 @@ $completed_count = mysqli_fetch_assoc($result_completed)['completed_count'];
                         </a>
                     </li>
                     <li>
+                        <a href="riwayat-pesanan.php">
+                            <i class="fas fa-history"></i>
+                            <span>Riwayat Pesanan</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="../login.php" class="logout">
                             <i class="fas fa-sign-out-alt"></i> Logout
                         </a>

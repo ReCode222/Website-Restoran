@@ -1,14 +1,20 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
 require_once '../database/config-login.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header('HTTP/1.1 403 Forbidden');
+    echo json_encode(['error' => 'Unauthorized access']);
     exit();
 }
 
 $start_date = isset($_GET['start_date']) ? $_GET['start_date'] : date('Y-m-d', strtotime('-7 days'));
 $end_date = isset($_GET['end_date']) ? $_GET['end_date'] : date('Y-m-d');
+
+// Log the received dates
+error_log("Received dates - Start: $start_date, End: $end_date");
 
 // Query untuk data grafik
 $sql_chart = "SELECT 
@@ -29,6 +35,17 @@ $sql_table = "SELECT id, total_price, status, created_at
               ORDER BY created_at DESC";
 
 try {
+    // Check if database connection is working
+    if (!$conn) {
+        throw new Exception("Database connection failed: " . mysqli_connect_error());
+    }
+
+    // Check if orders table exists
+    $table_check = $conn->query("SHOW TABLES LIKE 'orders'");
+    if ($table_check->num_rows == 0) {
+        throw new Exception("Table 'orders' does not exist in the database");
+    }
+
     // Query untuk ringkasan
     $sql_summary = "SELECT 
         COALESCE(SUM(total_price), 0) as total_revenue,

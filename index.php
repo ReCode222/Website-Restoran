@@ -94,6 +94,7 @@
                 case 'processing':
                     $statusText = 'Sedang Diproses';
                     $statusClass = 'processing';
+                    $showOrderAgain = true;
                     $noteText = 'Pesanan Anda sedang diproses. Mohon tunggu sebentar!';
                     break;
                 case 'cancelled':
@@ -105,7 +106,8 @@
                 default:
                     $statusText = 'Menunggu';
                     $statusClass = 'pending';
-                    $noteText = 'Silahkan tunggu pesanan Anda';
+                    $showOrderAgain = true;
+                    $noteText = 'Silahkan bayar pesanan anda di kasir';
             }
 
             echo '
@@ -117,8 +119,8 @@
                     <p class="order-note">' . $noteText . '</p>';
 
             if ($showOrderAgain) {
-                echo '<button onclick="window.location.href=\'user/menu.php\'" class="btn-order-again">
-                        Pesan Lagi
+                echo '<button onclick="window.location.href=\'index.php\'" class="btn-order-again">
+                        Kembali Ke Halaman Utama
                       </button>';
             }
 

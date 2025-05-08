@@ -15,22 +15,8 @@ $result_user = mysqli_query($conn, $query_user);
 $user_data = mysqli_fetch_assoc($result_user);
 $username = $user_data['username'];
 
-// Handle pesanan selesai
-if(isset($_POST['pesanan_selesai'])) {
-    $order_id = $_POST['order_id'];
-    $update_query = "UPDATE orders SET status = 'completed' WHERE id = $order_id";
-    
-    if(mysqli_query($conn, $update_query)) {
-        // Refresh halaman
-        header("Location: kelola-pesanan.php");
-        exit();
-    } else {
-        $error = "Gagal mengubah status pesanan: " . mysqli_error($conn);
-    }
-}
-
-// Get processing orders
-$query_orders = "SELECT id, order_number, total_price, status, created_at FROM orders WHERE status = 'processing' ORDER BY created_at DESC";
+// Get all orders except pending
+$query_orders = "SELECT id, order_number, total_price, status, created_at FROM orders WHERE status='completed' ORDER BY created_at DESC";
 $result_orders = mysqli_query($conn, $query_orders);
 ?>
 
@@ -39,9 +25,9 @@ $result_orders = mysqli_query($conn, $query_orders);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola Pesanan - Pelayan</title>
+    <title>Riwayat Pesanan - Pelayan</title>
     <link rel="stylesheet" href="../css/pelayan-sidebar.css">
-    <link rel="stylesheet" href="../css/kelola-pesanan-pelayan.css">
+    <link rel="stylesheet" href="../css/kelola-pesanan-kasir.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -60,13 +46,13 @@ $result_orders = mysqli_query($conn, $query_orders);
                             <span>Dashboard</span>
                         </a>
                     </li>
-                    <li class="active">
+                    <li>
                         <a href="kelola-pesanan.php">
                             <i class="fas fa-clipboard-list"></i>
                             <span>Kelola Pesanan</span>
                         </a>
                     </li>
-                    <li>
+                    <li class="active">
                         <a href="riwayat-pesanan.php">
                             <i class="fas fa-history"></i>
                             <span>Riwayat Pesanan</span>
@@ -83,19 +69,15 @@ $result_orders = mysqli_query($conn, $query_orders);
 
         <div class="main-content">
             <header>
-                <h1>Kelola Pesanan</h1>
+                <h1>Riwayat Pesanan</h1>
                 <div class="user-welcome">
                     <p>Selamat datang, <span class="username"><?php echo $username; ?></span></p>
                 </div>
             </header>
 
             <div class="orders-container">
-                <?php if(isset($error)): ?>
-                    <div class="alert alert-danger"><?php echo $error; ?></div>
-                <?php endif; ?>
-                
                 <div class="order-header">
-                    <h2>Daftar Pesanan yang Belum Disajikan</h2>
+                    <h2>Daftar Riwayat Pesanan</h2>
                     <div class="refresh-btn" id="refresh-btn">
                         <i class="fas fa-sync-alt"></i> Refresh
                     </div>
@@ -121,8 +103,20 @@ $result_orders = mysqli_query($conn, $query_orders);
                                     <td><?php echo $order['order_number']; ?></td>
                                     <td>Rp <?php echo number_format($order['total_price'], 0, ',', '.'); ?></td>
                                     <td>
-                                        <span class="status processing">
-                                            <?php echo ucfirst($order['status']); ?>
+                                        <span class="status <?php echo $order['status']; ?>">
+                                            <?php 
+                                            switch($order['status']) {
+                                                case 'processing':
+                                                    echo 'Diproses';
+                                                    break;
+                                                case 'completed':
+                                                    echo 'Selesai';
+                                                    break;
+                                                case 'cancelled':
+                                                    echo 'Dibatalkan';
+                                                    break;
+                                            }
+                                            ?>
                                         </span>
                                     </td>
                                     <td><?php echo date('d-m-Y H:i', strtotime($order['created_at'])); ?></td>
@@ -135,7 +129,7 @@ $result_orders = mysqli_query($conn, $query_orders);
                                 <?php endwhile; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="6" class="no-data">Tidak ada pesanan yang perlu disajikan saat ini.</td>
+                                    <td colspan="6" class="no-data">Tidak ada riwayat pesanan.</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -189,7 +183,7 @@ $result_orders = mysqli_query($conn, $query_orders);
 
         function refreshOrdersTable() {
             $.ajax({
-                url: 'ajax/get-orders.php',
+                url: 'ajax/get-order-history.php',
                 type: 'GET',
                 success: function(response) {
                     $('#orders-table').html(response);
@@ -199,7 +193,7 @@ $result_orders = mysqli_query($conn, $query_orders);
 
         function loadOrderDetails(orderId) {
             $.ajax({
-                url: 'ajax/get-order-details.php',
+                url: 'ajax/get-order-history-detail.php',
                 type: 'GET',
                 data: { id: orderId },
                 success: function(response) {
@@ -210,4 +204,4 @@ $result_orders = mysqli_query($conn, $query_orders);
         }
     </script>
 </body>
-</html>
+</html> 

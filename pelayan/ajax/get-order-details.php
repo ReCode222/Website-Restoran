@@ -34,8 +34,11 @@ $result_items = mysqli_query($conn, $query_items);
 
 <div class="order-info">
     <p><strong>No. Pesanan:</strong> <?php echo $order['order_number']; ?></p>
+    <br>
     <p><strong>Tanggal:</strong> <?php echo date('d-m-Y H:i', strtotime($order['created_at'])); ?></p>
+    <br>
     <p><strong>Status:</strong> <span class="status processing"><?php echo ucfirst($order['status']); ?></span></p>
+    <br>
 </div>
 
 <h3>Item Pesanan</h3>

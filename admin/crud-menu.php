@@ -181,7 +181,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
     <div class="admin-container">
-        <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
             <div class="logo-container">
                 <img src="../assets/logo.png" alt="Logo" class="logo">
@@ -196,7 +195,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </a>
                 <a href="read-pesanan.php">
                     <i class="fas fa-clipboard-list"></i> Lihat Pesanan
-                </a>
+            </a>
                 <a href="akun.php">
                     <i class="fas fa-user"></i> Kelola Akun
                 </a>
@@ -206,7 +205,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </nav>
         </div>
 
-        <!-- Main Content -->
         <div class="main-content">
             <header>
                 <button id="toggleSidebar" class="toggle-btn">
@@ -218,7 +216,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             </header>
 
-            <!-- Menu Management -->
             <div class="menu-container">
                 <div class="menu-actions">
                     <button class="add-menu-btn" onclick="showAddForm()">

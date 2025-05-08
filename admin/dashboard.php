@@ -157,14 +157,12 @@ $orderData = getOrderData($period);
         const labels = orderData.map(item => item.date);
         const datasets = [
             {
-                label: 'Selesai',
+                label: 'Pesanan Selesai',
                 data: orderData.map(item => item.completed),
                 backgroundColor: '#4CAF50',
-            },
-            {
-                label: 'Dibatalkan',
-                data: orderData.map(item => item.cancelled),
-                backgroundColor: '#F44336',
+                borderColor: '#388E3C',
+                borderWidth: 1,
+                borderRadius: 5
             }
         ];
 
@@ -183,10 +181,13 @@ $orderData = getOrderData($period);
                     x: {
                         title: {
                             display: true,
-                            text: ''
+                            text: 'Tanggal'
                         },
                         barPercentage: 0.8,
-                        categoryPercentage: 0.9
+                        categoryPercentage: 0.9,
+                        grid: {
+                            display: false
+                        }
                     },
                     y: {
                         beginAtZero: true,
@@ -196,26 +197,38 @@ $orderData = getOrderData($period);
                         title: {
                             display: true,
                             text: 'Jumlah Pesanan'
+                        },
+                        grid: {
+                            color: '#f0f0f0'
                         }
                     }
                 },
                 plugins: {
                     legend: {
-                        position: 'top',
+                        display: false
                     },
                     title: {
                         display: true,
-                        text: 'Statistik Pesanan Selesai dan Dibatalkan',
+                        text: 'Statistik Pesanan Selesai',
                         font: {
-                            size: 16
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        padding: {
+                            bottom: 20
                         }
                     },
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                return `${context.dataset.label}: ${context.raw} pesanan`;
+                                return `${context.raw} pesanan selesai`;
                             }
-                        }
+                        },
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        padding: 10,
+                        cornerRadius: 5
                     }
                 },
                 interaction: {

@@ -81,6 +81,9 @@
                         data.data.forEach(item => {
                             const menuItem = document.createElement('div');
                             menuItem.className = 'menu-item';
+                            const cartItem = cart.find(ci => ci.id === item.id);
+                            const quantity = cartItem ? cartItem.quantity : 0;
+                            
                             menuItem.innerHTML = `
                                 <img src="${item.image_url}" alt="${item.name}">
                                 <div class="menu-info">
@@ -88,10 +91,22 @@
                                     <p>${item.description}</p>
                                     <div class="menu-price">
                                         <span class="price-tag">${item.price_formatted}</span>
-                                        <button class="add-to-cart-btn" onclick="addToCart(${JSON.stringify(item).replace(/"/g, '&quot;')})">
-                                            <i class="fas fa-shopping-cart"></i>
-                                            Tambahkan ke Keranjang
-                                        </button>
+                                        ${quantity > 0 ? `
+                                            <div class="quantity-controls">
+                                                <button onclick="decreaseMenuQuantity(${item.id})">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                                <span>${quantity}</span>
+                                                <button onclick="increaseMenuQuantity(${item.id})">
+                                                    <i class="fas fa-plus"></i>
+                                                </button>
+                                            </div>
+                                        ` : `
+                                            <button class="add-to-cart-btn" onclick="addToCart(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+                                                <i class="fas fa-shopping-cart"></i>
+                                                Tambahkan ke Keranjang
+                                            </button>
+                                        `}
                                     </div>
                                 </div>
                             `;
@@ -115,6 +130,7 @@
             }
 
             updateCartTotal();
+            loadMenu(document.querySelector('.category-btn.active')?.dataset.category || 1);
         }
 
         // Update cart total
@@ -242,6 +258,28 @@
             cart = cart.filter(item => item.id !== itemId);
             updateCartTotal();
             showCart(); // Refresh tampilan cart
+        }
+
+        // Add new functions for menu quantity controls
+        function increaseMenuQuantity(itemId) {
+            const item = cart.find(item => item.id === itemId);
+            if (item) {
+                item.quantity++;
+                updateCartTotal();
+                loadMenu(document.querySelector('.category-btn.active')?.dataset.category || 1);
+            }
+        }
+
+        function decreaseMenuQuantity(itemId) {
+            const item = cart.find(item => item.id === itemId);
+            if (item) {
+                item.quantity--;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(item => item.id !== itemId);
+                }
+                updateCartTotal();
+                loadMenu(document.querySelector('.category-btn.active')?.dataset.category || 1);
+            }
         }
     </script>
     

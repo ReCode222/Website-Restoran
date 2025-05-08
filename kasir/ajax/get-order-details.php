@@ -123,9 +123,6 @@ while($item = mysqli_fetch_assoc($result_items)) {
         <form method="post" action="kelola-pesanan.php" class="cancel-form">
             <input type="hidden" name="order_id" value="<?php echo $order_id; ?>">
             <input type="hidden" name="new_status" value="cancelled">
-            <button type="submit" name="update_status" class="cancel-btn">
-                <i class="fas fa-times-circle"></i> Batalkan Pesanan
-            </button>
         </form>
     </div>
 </div>

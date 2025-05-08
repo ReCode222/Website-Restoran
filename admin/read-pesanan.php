@@ -256,10 +256,7 @@ foreach ($orderData as $data) {
                         <h3>Total Pesanan</h3>
                         <div class="value" id="totalOrders"><?php echo $summary['total_orders']; ?></div>
                     </div>
-                    <div class="summary-card">
-                        <h3>Rata-rata Pesanan</h3>
-                        <div class="value" id="avgOrder">Rp <?php echo number_format($completedSummary['avg_order'], 0, ',', '.'); ?></div>
-                    </div>
+                    
                 </div>
 
                 <div class="chart-container">
@@ -411,8 +408,16 @@ foreach ($orderData as $data) {
 
             // Update grafik, tabel, dan ringkasan
             fetch(`get_order_data.php?start_date=${startDate}&end_date=${endDate}`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
                     // Update chart
                     salesChart.data.labels = data.labels;
                     salesChart.data.datasets[0].data = data.pending;
@@ -428,8 +433,6 @@ foreach ($orderData as $data) {
                         data.completedSummary.total_orders;
                     document.getElementById('totalOrders').textContent = 
                         data.summary.total_orders;
-                    document.getElementById('avgOrder').textContent = 
-                        'Rp ' + new Intl.NumberFormat('id-ID').format(data.completedSummary.avg_order);
 
                     // Update completed table
                     const completedTableBody = document.querySelector('#completedOrdersTable tbody');
@@ -458,8 +461,8 @@ foreach ($orderData as $data) {
                     `).join('');
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    alert('Terjadi kesalahan saat mengambil data');
+                    console.error('Error details:', error);
+                    alert('Terjadi kesalahan saat mengambil data: ' + error.message);
                 });
         }
 

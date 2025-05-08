@@ -52,4 +52,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header("Location: akun.php?error=password_change_failed");
         }
     }
+
+    elseif ($action === 'delete') {
+        $user_id = $_POST['user_id'];
+        
+        // Cek apakah user yang akan dihapus adalah admin
+        $check_sql = "SELECT role FROM users WHERE id = ?";
+        $check_stmt = $conn->prepare($check_sql);
+        $check_stmt->bind_param("i", $user_id);
+        $check_stmt->execute();
+        $result = $check_stmt->get_result();
+        $user = $result->fetch_assoc();
+        
+        if ($user['role'] === 'admin') {
+            echo json_encode(['status' => 'error', 'message' => 'Tidak dapat menghapus akun admin']);
+            exit();
+        }
+        
+        // Hapus user
+        $delete_sql = "DELETE FROM users WHERE id = ?";
+        $delete_stmt = $conn->prepare($delete_sql);
+        $delete_stmt->bind_param("i", $user_id);
+        
+        if ($delete_stmt->execute()) {
+            echo json_encode(['status' => 'success', 'message' => 'User berhasil dihapus']);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'Gagal menghapus user']);
+        }
+    }
 } 

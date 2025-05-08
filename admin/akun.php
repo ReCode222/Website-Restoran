@@ -102,6 +102,9 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                                 echo "<button class='password-btn' onclick='showPasswordModal({$row['id']}, \"".htmlspecialchars($row['username'])."\")'>";
                                 echo "<i class='fas fa-key'></i> Ubah Password";
                                 echo "</button>";
+                                echo "<button class='delete-btn' onclick='showDeleteModal({$row['id']}, \"".htmlspecialchars($row['username'])."\")'>";
+                                echo "<i class='fas fa-trash'></i> Hapus";
+                                echo "</button>";
                             } else {
                                 echo "<button class='edit-btn disabled' disabled>";
                                 echo "<i class='fas fa-lock'></i> Tidak dapat diedit";
@@ -186,6 +189,24 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                     </form>
                 </div>
             </div>
+
+            <!-- Tambahkan Modal Hapus User -->
+            <div id="deleteModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeDeleteModal()">&times;</span>
+                    <h2>Hapus User</h2>
+                    <p>Apakah Anda yakin ingin menghapus user <span id="delete_username"></span>?</p>
+                    <p class="warning">Perhatian: Aksi ini tidak dapat dibatalkan!</p>
+                    <form id="deleteUserForm" method="POST" action="process-user.php">
+                        <input type="hidden" name="action" value="delete">
+                        <input type="hidden" name="user_id" id="delete_user_id">
+                        <div class="form-buttons">
+                            <button type="button" class="cancel-btn" onclick="closeDeleteModal()">Batal</button>
+                            <button type="submit" class="delete-submit-btn">Hapus</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -232,6 +253,17 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
         function closePasswordModal() {
             document.getElementById('passwordModal').style.display = 'none';
+        }
+
+        // Tambahkan fungsi untuk modal hapus
+        function showDeleteModal(id, username) {
+            document.getElementById('delete_user_id').value = id;
+            document.getElementById('delete_username').textContent = username;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
         }
     </script>
 </body>
